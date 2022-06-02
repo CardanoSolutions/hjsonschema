@@ -5,9 +5,9 @@ module JSONSchema.Validator.Draft4.Object
 
 import           Import
 
+import qualified Data.Aeson.KeyMap as Aeson.KeyMap
 import qualified Data.HashMap.Strict as HM
 import qualified Data.List.NonEmpty as NE
-import           Data.Set (Set)
 import qualified Data.Set as Set
 import qualified Data.Text as T
 
@@ -172,7 +172,7 @@ dependenciesVal f (DependenciesValidator hm) x =
       g :: Text -> Dependency schema -> Maybe (DependencyMemberInvalid err)
       g k (SchemaDependency schema)
           | HM.member k x = SchemaDepInvalid
-                        <$> NE.nonEmpty (f schema (Object x))
+                        <$> NE.nonEmpty (f schema (Object (Aeson.KeyMap.fromHashMapText x)))
           | otherwise = Nothing
       g k (PropertyDependency ts)
           | HM.member k x && not allPresent = Just (PropertyDepInvalid ts x)

@@ -2,6 +2,7 @@ module JSONSchema.Draft4.Schema where
 
 import           Import hiding (mapMaybe)
 
+import qualified Data.Aeson.KeyMap as Aeson.KeyMap
 import qualified Data.HashMap.Strict as HM
 import           Data.List.NonEmpty (NonEmpty)
 import           Data.Maybe (fromJust, isJust)
@@ -110,7 +111,7 @@ instance FromJSON Schema where
         b  <- o .:! "id"
         c  <- o .:! "$ref"
         d  <- o .:! "definitions"
-        e  <- parseJSON (Object (HM.difference o internalSchemaHashMap))
+        e  <- parseJSON (Object (Aeson.KeyMap.difference o (Aeson.KeyMap.fromHashMapText internalSchemaHashMap)))
 
         f  <- o .:! "multipleOf"
         g  <- o .:! "maximum"
@@ -193,8 +194,8 @@ instance ToJSON Schema where
     -- of Bool for "exclusiveMaximum". This would have made writing schemas
     -- in haskell easier, but we could no longer round trip through/from
     -- JSON without losing information.
-    toJSON s = Object $ HM.union (mapMaybe ($ s) internalSchemaHashMap)
-                                 (toJSON <$> _schemaOther s)
+    toJSON s = Object $ Aeson.KeyMap.fromHashMapText $
+        HM.union (mapMaybe ($ s) internalSchemaHashMap) (toJSON <$> _schemaOther s)
       where
         -- 'mapMaybe' is provided by unordered-containers after
         -- unordered-container-2.6.0.0, but until that is a little older

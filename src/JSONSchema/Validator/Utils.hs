@@ -6,10 +6,11 @@ import           Control.Monad (fail)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.List.NonEmpty as NE
 import           Data.Scientific (Scientific, fromFloatDigits)
-import           Data.Set (Set)
 import qualified Data.Set as S
 import qualified Data.Text as T
 import qualified Data.Vector as V
+import qualified Data.Aeson.KeyMap as Aeson.KeyMap
+import qualified Data.Aeson.Key as Aeson.Key
 
 --------------------------------------------------
 -- * QuickCheck
@@ -38,7 +39,7 @@ instance Arbitrary ArbitraryValue where
             | otherwise = oneof $
                   fmap (Array . V.fromList) (traverse (const (f (n `div` 10)))
                     =<< (arbitrary :: Gen [()]))
-                : fmap (Object . HM.fromList) (traverse (const (g (n `div` 10)))
+                : fmap (Object . Aeson.KeyMap.fromList . fmap (first Aeson.Key.fromText)) (traverse (const (g (n `div` 10)))
                     =<< (arbitrary :: Gen [()]))
                 : nonRecursive
 
@@ -116,4 +117,4 @@ instance Ord OrdValue where
     _                     `compare` (OrdValue (Array _))  = GT
 
     (OrdValue (Object x)) `compare` (OrdValue (Object y)) =
-        HM.toList (OrdValue <$> x) `compare` HM.toList (OrdValue <$> y)
+        Aeson.KeyMap.toList (OrdValue <$> x) `compare` Aeson.KeyMap.toList (OrdValue <$> y)

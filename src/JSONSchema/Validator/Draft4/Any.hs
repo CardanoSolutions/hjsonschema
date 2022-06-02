@@ -2,6 +2,8 @@ module JSONSchema.Validator.Draft4.Any where
 
 import           Import hiding ((<>))
 
+import qualified Data.Aeson.Key as Aeson.Key
+import qualified Data.Aeson.KeyMap as Aeson.KeyMap
 import           Data.Aeson.TH (constructorTagModifier)
 import           Data.Char (toLower)
 import qualified Data.HashMap.Strict as HM
@@ -184,14 +186,14 @@ newBaseURIFromFragment
 newBaseURIFromFragment updateScope baseURI v =
   case v of
     Object hm -> do
-      let hmWithOnlyId = case HM.lookup idKey hm of
+      let hmWithOnlyId = case Aeson.KeyMap.lookup idKey hm of
                            Nothing    -> mempty
-                           Just idVal -> HM.singleton idKey idVal
+                           Just idVal -> Aeson.KeyMap.singleton idKey idVal
       schema <- first SubschemaDecodingError (fromJSONEither (Object hmWithOnlyId))
       Right (updateScope baseURI schema)
     _ -> Right baseURI
   where
-    idKey :: Text
+    idKey :: Aeson.Key.Key
     idKey = "id"
 
 --------------------------------------------------
