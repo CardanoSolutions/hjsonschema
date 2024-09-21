@@ -7,7 +7,7 @@ import           Data.Aeson as Export
 import           Data.HashMap.Strict as Export (HashMap)
 import           Data.List.NonEmpty as Export (NonEmpty)
 import           Data.Vector as Export (Vector)
-import           Test.QuickCheck as Export hiding (Failure, Result, Success,
+import           Test.QuickCheck as Export hiding (witness, Failure, Result, Success,
                                             (.&.))
 
 import qualified Data.Text as T
